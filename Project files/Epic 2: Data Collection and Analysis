@@ -1,0 +1,68 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Graph Style
+plt.style.use("fivethirtyeight")
+
+# ===============================
+# Read Dataset
+# ===============================
+data = pd.read_csv(r"C:\Users\SRAVANTHI\Downloads\Crop_recommendation.csv")
+
+print("\nFirst 5 Rows:")
+print(data.head())
+
+print("\nDataset Information:")
+print(data.info())
+
+print("\nStatistical Summary:")
+print(data.describe())
+
+# ===============================
+# Univariate Analysis
+# ===============================
+columns = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
+
+for col in columns:
+    plt.figure(figsize=(6,4))
+    sns.histplot(data[col], kde=True)
+    plt.title(f"Distribution of {col}")
+    plt.xlabel(col)
+    plt.ylabel("Count")
+    plt.show()
+
+# ===============================
+# Bivariate Analysis
+# ===============================
+plt.figure(figsize=(12,6))
+sns.scatterplot(x='humidity', y='label', data=data)
+
+plt.title("Humidity vs Crop Label")
+plt.xlabel("Humidity")
+plt.ylabel("Crop")
+plt.show()
+
+# ===============================
+# Multivariate Analysis
+# ===============================
+
+# Correlation Heatmap
+plt.figure(figsize=(10,8))
+sns.heatmap(data.corr(numeric_only=True), annot=True, cmap="YlGnBu")
+plt.title("Correlation Matrix")
+plt.show()
+
+# Crop Count Plot
+plt.figure(figsize=(10,8))
+sns.countplot(y='label', data=data)
+plt.title("Crop Distribution")
+plt.show()
+
+print("\nAnalysis Completed Successfully!")
