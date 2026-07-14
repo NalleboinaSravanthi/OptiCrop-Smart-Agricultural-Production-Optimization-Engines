@@ -1,0 +1,172 @@
+# ============================================================
+# OptiCrop: Smart Agricultural Production Optimization Engine
+# Epic 3: Data Pre-processing
+# ============================================================
+
+# Import Required Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+
+# ------------------------------------------------------------
+# Load Dataset
+# ------------------------------------------------------------
+data = pd.read_csv(r"C:\Users\SRAVANTHI\Downloads\Crop_recommendation.csv")
+
+print("="*60)
+print("DATASET LOADED SUCCESSFULLY")
+print("="*60)
+
+# ============================================================
+# TASK 1 : Checking for Null Values
+# ============================================================
+
+print("\n")
+print("="*60)
+print("TASK 1 : CHECKING FOR NULL VALUES")
+print("="*60)
+
+print("\nDataset Shape")
+print(data.shape)
+
+print("\nDataset Information")
+print(data.info())
+
+print("\nMissing Values")
+print(data.isnull().sum())
+
+print("\nDuplicate Rows")
+print(data.duplicated().sum())
+
+# ============================================================
+# TASK 2 : Handling Outliers
+# ============================================================
+
+print("\n")
+print("="*60)
+print("TASK 2 : HANDLING OUTLIERS")
+print("="*60)
+
+# Boxplot
+plt.figure(figsize=(10,6))
+sns.boxplot(data=data)
+plt.title("Boxplot of Agricultural Features")
+plt.show()
+
+# Outlier Detection using Potassium (K)
+
+Q1 = data['K'].quantile(0.25)
+Q3 = data['K'].quantile(0.75)
+
+IQR = Q3 - Q1
+
+Lower_Bound = Q1 - (1.5 * IQR)
+Upper_Bound = Q3 + (1.5 * IQR)
+
+print("\nQ1 :",Q1)
+print("Q3 :",Q3)
+print("IQR :",IQR)
+print("Lower Bound :",Lower_Bound)
+print("Upper Bound :",Upper_Bound)
+
+# Remove Outliers
+
+data = data[
+    (data['K'] >= Lower_Bound) &
+    (data['K'] <= Upper_Bound)
+]
+
+print("\nDataset Shape After Removing Outliers")
+print(data.shape)
+
+# Boxplot After Removing Outliers
+
+plt.figure(figsize=(10,6))
+sns.boxplot(data=data)
+plt.title("Boxplot After Removing Outliers")
+plt.show()
+
+# Optional Log Transformation
+
+data['K'] = np.log1p(data['K'])
+
+plt.figure(figsize=(6,4))
+sns.histplot(data['K'], kde=True)
+plt.title("Potassium After Log Transformation")
+plt.show()
+
+# ============================================================
+# TASK 3 : Extracting Seasonal Crops
+# ============================================================
+
+print("\n")
+print("="*60)
+print("TASK 3 : EXTRACTING SEASONAL CROPS")
+print("="*60)
+
+print("\nSummer Crops")
+
+summer = data[
+    (data['temperature'] > 30) &
+    (data['humidity'] > 50)
+]
+
+print(summer['label'].unique())
+
+print("\nWinter Crops")
+
+winter = data[
+    (data['temperature'] < 20) &
+    (data['humidity'] > 30)
+]
+
+print(winter['label'].unique())
+
+print("\nRainy Crops")
+
+rainy = data[
+    (data['rainfall'] > 200) &
+    (data['humidity'] > 50)
+]
+
+print(rainy['label'].unique())
+
+# ============================================================
+# TASK 4 : Train-Test Split
+# ============================================================
+
+print("\n")
+print("="*60)
+print("TASK 4 : TRAIN TEST SPLIT")
+print("="*60)
+
+X = data.drop("label", axis=1)
+y = data["label"]
+
+print("\nShape of X :", X.shape)
+print("Shape of y :", y.shape)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+print("\nTraining Set")
+
+print("Shape of X_train :", X_train.shape)
+print("Shape of y_train :", y_train.shape)
+
+print("\nTesting Set")
+
+print("Shape of X_test :", X_test.shape)
+print("Shape of y_test :", y_test.shape)
+
+print("\n")
+print("="*60)
+print("EPIC 3 COMPLETED SUCCESSFULLY")
+print("="*60)
