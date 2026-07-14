@@ -1,0 +1,191 @@
+# ============================================================
+# OptiCrop: Smart Agricultural Production Optimization Engine
+# Epic 4: Model Building
+# ============================================================
+
+# Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix
+)
+
+# ============================================================
+# Load Dataset
+# ============================================================
+
+df = pd.read_csv(r"C:\Users\SRAVANTHI\Downloads\Crop_recommendation.csv")
+
+print("=" * 70)
+print("OPTICROP - EPIC 4 : MODEL BUILDING")
+print("=" * 70)
+
+# ============================================================
+# Prepare Features and Target
+# ============================================================
+
+X = df.drop("label", axis=1)
+y = df["label"]
+
+# ============================================================
+# TASK 1 : K-Means Clustering
+# ============================================================
+
+print("\n")
+print("=" * 70)
+print("TASK 1 : K-MEANS CLUSTERING")
+print("=" * 70)
+
+plt.rcParams["figure.figsize"] = (10,5)
+
+wcss = []
+
+for i in range(1,11):
+
+    km = KMeans(
+        n_clusters=i,
+        init="k-means++",
+        max_iter=300,
+        n_init=10,
+        random_state=42
+    )
+
+    km.fit(X)
+    wcss.append(km.inertia_)
+
+plt.plot(range(1,11), wcss, marker='o')
+
+plt.title("The Elbow Method")
+plt.xlabel("Number of Clusters")
+plt.ylabel("WCSS")
+plt.grid(True)
+plt.show()
+
+# Final Model
+
+km = KMeans(
+    n_clusters=4,
+    init="k-means++",
+    max_iter=300,
+    n_init=10,
+    random_state=42
+)
+
+clusters = km.fit_predict(X)
+
+cluster_df = pd.DataFrame(clusters, columns=["Cluster"])
+
+result = pd.concat([cluster_df, df["label"]], axis=1)
+
+print("\nFirst Cluster")
+print(result[result["Cluster"]==0]["label"].unique())
+
+print("\nSecond Cluster")
+print(result[result["Cluster"]==1]["label"].unique())
+
+print("\nThird Cluster")
+print(result[result["Cluster"]==2]["label"].unique())
+
+print("\nFourth Cluster")
+print(result[result["Cluster"]==3]["label"].unique())
+
+# ============================================================
+# TASK 2 : Logistic Regression
+# ============================================================
+
+print("\n")
+print("=" * 70)
+print("TASK 2 : LOGISTIC REGRESSION")
+print("=" * 70)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+model = LogisticRegression(max_iter=1000)
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("\nModel Trained Successfully!")
+
+# ============================================================
+# TASK 3 : Model Evaluation
+# ============================================================
+
+print("\n")
+print("=" * 70)
+print("TASK 3 : MODEL EVALUATION")
+print("=" * 70)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\nAccuracy Score")
+print(accuracy)
+
+print("\nClassification Report")
+print(classification_report(y_test, y_pred))
+
+print("\nConfusion Matrix")
+print(confusion_matrix(y_test, y_pred))
+
+# ============================================================
+# TASK 4 : Save Best Model
+# ============================================================
+
+print("\n")
+print("=" * 70)
+print("TASK 4 : SAVE MODEL")
+print("=" * 70)
+
+pickle.dump(model, open("model.pkl", "wb"))
+
+print("Model Saved Successfully as model.pkl")
+
+loaded_model = pickle.load(open("model.pkl", "rb"))
+
+print("Saved Model Loaded Successfully")
+
+# ============================================================
+# TASK 5 : Predict Best Crop
+# ============================================================
+
+print("\n")
+print("=" * 70)
+print("TASK 5 : CROP PREDICTION")
+print("=" * 70)
+
+sample = pd.DataFrame(
+    [[105,35,40,25,64,7,160]],
+    columns=[
+        "N",
+        "P",
+        "K",
+        "temperature",
+        "humidity",
+        "ph",
+        "rainfall"
+    ]
+)
+
+prediction = loaded_model.predict(sample)
+
+print("\nSuggested Crop")
+print(prediction[0])
+
+print("\n")
+print("=" * 70)
+print("EPIC 4 COMPLETED SUCCESSFULLY")
+print("=" * 70)
