@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Find Your Crop</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="crop">
+
+<nav>
+
+<a href="/">Home</a>
+
+<a href="/about">About</a>
+
+<a href="/findyourcrop">Find Your Crop</a>
+
+</nav>
+
+<div class="glass">
+
+<h1>Find Your Best Crop</h1>
+
+<form action="/predict" method="post">
+
+<input type="number" name="N" placeholder="Nitrogen" required>
+
+<input type="number" name="P" placeholder="Phosphorous" required>
+
+<input type="number" name="K" placeholder="Potassium" required>
+
+<input type="number" step="any" name="temperature" placeholder="Temperature" required>
+
+<input type="number" step="any" name="humidity" placeholder="Humidity" required>
+
+<input type="number" step="any" name="ph" placeholder="pH" required>
+
+<input type="number" step="any" name="rainfall" placeholder="Rainfall" required>
+
+<button type="submit">
+
+Predict Crop
+
+</button>
+
+</form>
+
+<h2>{{ prediction_text }}</h2>
+
+</div>
+
+</body>
+
+</html>
